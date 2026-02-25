@@ -356,3 +356,55 @@ EOF;
 在填写完“success”之后，右键检查，在控制台执行“generate_token()”后点击提交即可。
 
 ![](https://ChihungSan.github.io/picx-images-hosting/dvwa-js-attack/image.54yaqzk9ly.webp)
+
+
+
+## 2. Medium
+
+Medium等级下，请求的也是“vulnerabilities/javascript/”，也是index.php的内容，不过index.php中的if会判断为medium，会执行vulnerabilities/javascript/source/medium.php代码。
+
+![](https://ChihungSan.github.io/picx-images-hosting/dvwa-js-attack/image.7ehbajolxx.webp)
+
+而medium.php代码如下
+
+```php
+<?php
+$page[ 'body' ] .= <<<EOF
+<script src="/vulnerabilities/javascript/source/medium.js"></script>
+EOF;
+?>
+```
+
+其中的medium.js代码如下：
+
+```php
+function do_something(e){
+	for(var t="",n=e.length-1;n>=0;n--)
+	t+=e[n];
+	return t
+}
+# setTimeout函数定时300毫秒后执行do_elsesomething函数
+setTimeout(
+	function(){
+		do_elsesomething("XX")
+	},300
+);
+function do_elsesomething(e){
+		document.getElementById("token").value = do_something(
+					e+document.getElementById("phrase").value+"XX"
+				)
+		
+}
+```
+
+可以看到，index.php执行medium.php代码，将返回前端的代码拼接了一部分内容，该部分内容又使用<script>标签引入了medium.js文件，在返回到前端之后执行了medium.js的代码。
+
+分析medium.js的代码发现， setTimeout函数定时300毫秒后执行do_elsesomething函数，将“XX”作为参数，而do_elsesomething函数的作用是`将当前页面的“phrase”的值前后拼接上XX，再使用do_something函数，使得这个字符串倒序后赋值给token`。
+
+出现的问题和low一样，填写“success”提交之后，token是之前就已经生成的token，所以无效。
+
+此时解决方法就明朗了。
+
+解决方法一：填写“success”后，在提交之前，重新执行一下do_elsesomething("XX")即可。
+
+解决方法二：已经知道token的生成规则，直接在burpsuite中修改token为“XXsseccusXX”提交即可。

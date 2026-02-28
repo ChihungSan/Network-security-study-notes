@@ -294,6 +294,8 @@ build_security_Strategy.bat脚本代码如下：
 
 bat脚本如果在执行的过程中中文乱码，则另存为的时候选择ANSI编码即可。
 
+将两个文件放到同一个路径下，管理员权限运行build_security_Strategy.bat脚本即可
+
 ```bat
 @echo off
 echo.

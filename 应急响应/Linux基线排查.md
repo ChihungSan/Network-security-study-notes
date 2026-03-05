@@ -39,8 +39,35 @@
    passwd ubuntu
    ```
 
-   
+   ​	为新建的ubuntu账户赋予和root账户一样的权限
 
+   ```shell
+   # 赋权
+   chmod u+w /etc/sudoers && vim /etc/sudoers
+   
+   # 在sudoers文件中新加一行
+   ubuntu ALL=(ALL:ALL) ALL
+   
+   # 撤销权限
+   chmod u-w /etc/sudoers
+   ```
+   
+   ​	验证下新建ubuntu账户是否可以
+   
+   ![](https://ChihungSan.github.io/picx-images-hosting/linux_jixian/image.mmctry06.webp)
+   
+   ​	关闭root远程登录权限
+   
+   ```
+   vim /etc/ssh/sshd_config
+   ```
+   
+   修改为`PermitRootLogin no`，并`systemctl restart ssh`重启ssh
+   
+   预期效果：root用户无法直接登陆ssh，以sudo新用户身份登录系统后，执行sudo命令可获取root操作权
+   
+   
+   
    > [!IMPORTANT] 
    >
    > ***sudo 和 su***
@@ -60,9 +87,9 @@
    > 所以sudo su的作用是：
    >
    > sudo su的含义就是要用root权限运行su命令，既然是用root权限运行su命令，那么就不需要输入切换到的用户的密码了。
-
    
-
+   
+   
    > [!IMPORTANT]
    >
    > 那么如果我就要强制使用强制使用root账户呢？
@@ -98,7 +125,7 @@
    > 上述配置完成后，就可以远程ssh登录root账户，但这是不安全的。
    >
    > 如果要删除root密码的话，使用`passwd -dl root`，删除后/etc/passwd文件中第二列变成 ！，账户锁定了。
-
+   
    
 
 ​	
@@ -106,17 +133,3 @@
 
 
 
-
-
-
-
-
-ssh服务开启之后重启还会不会关闭
-
-
-
-sudo 服务和root什么关系
-
-
-
-为什么root没有密码？
